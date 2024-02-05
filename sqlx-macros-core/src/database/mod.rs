@@ -172,8 +172,6 @@ mod mysql;
 mod sqlite;
 
 mod fake_sqlx {
-    pub use sqlx_core::*;
-
     #[cfg(feature = "mysql")]
     pub use sqlx_mysql as mysql;
 

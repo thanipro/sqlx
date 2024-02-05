@@ -48,14 +48,15 @@ pub async fn reset(
     connect_opts: &ConnectOpts,
     confirm: bool,
     force: bool,
+    migration_table: Option<String>,
 ) -> anyhow::Result<()> {
     drop(connect_opts, confirm, force).await?;
-    setup(migration_source, connect_opts).await
+    setup(migration_source, connect_opts, migration_table).await
 }
 
-pub async fn setup(migration_source: &str, connect_opts: &ConnectOpts) -> anyhow::Result<()> {
+pub async fn setup(migration_source: &str, connect_opts: &ConnectOpts, migration_table: Option<String>) -> anyhow::Result<()> {
     create(connect_opts).await?;
-    migrate::run(migration_source, connect_opts, false, false, None).await
+    migrate::run(migration_source, connect_opts, false, false, None, migration_table).await
 }
 
 fn ask_to_continue_drop(db_url: &str) -> bool {
