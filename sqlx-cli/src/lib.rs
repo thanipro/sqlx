@@ -36,6 +36,7 @@ pub async fn run(opt: Opt) -> Result<()> {
                 ignore_missing,
                 connect_opts,
                 target_version,
+                migration_table,
             } => {
                 migrate::run(
                     &source,
@@ -43,6 +44,7 @@ pub async fn run(opt: Opt) -> Result<()> {
                     dry_run,
                     *ignore_missing,
                     target_version,
+                    migration_table,
                 )
                 .await?
             }
@@ -52,6 +54,7 @@ pub async fn run(opt: Opt) -> Result<()> {
                 ignore_missing,
                 connect_opts,
                 target_version,
+                migration_table,
             } => {
                 migrate::revert(
                     &source,
@@ -59,13 +62,15 @@ pub async fn run(opt: Opt) -> Result<()> {
                     dry_run,
                     *ignore_missing,
                     target_version,
+                    migration_table,
                 )
                 .await?
             }
             MigrateCommand::Info {
                 source,
                 connect_opts,
-            } => migrate::info(&source, &connect_opts).await?,
+                migration_table,
+            } => migrate::info(&source, &connect_opts, migration_table).await?,
             MigrateCommand::BuildScript { source, force } => migrate::build_script(&source, force)?,
         },
 
@@ -81,11 +86,13 @@ pub async fn run(opt: Opt) -> Result<()> {
                 source,
                 connect_opts,
                 force,
-            } => database::reset(&source, &connect_opts, !confirmation.yes, force).await?,
+                migration_table,
+            } => database::reset(&source, &connect_opts, !confirmation.yes, force, migration_table).await?,
             DatabaseCommand::Setup {
                 source,
                 connect_opts,
-            } => database::setup(&source, &connect_opts).await?,
+                migration_table,
+            } => database::setup(&source, &connect_opts, migration_table).await?,
         },
 
         Command::Prepare {

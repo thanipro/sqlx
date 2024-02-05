@@ -96,6 +96,9 @@ pub enum DatabaseCommand {
         /// PostgreSQL only: force drops the database.
         #[clap(long, short, default_value = "false")]
         force: bool,
+
+        #[clap(long)]
+        migration_table: Option<String>,
     },
 
     /// Creates the database specified in your DATABASE_URL and runs any pending migrations.
@@ -105,6 +108,9 @@ pub enum DatabaseCommand {
 
         #[clap(flatten)]
         connect_opts: ConnectOpts,
+
+        #[clap(long)]
+        migration_table: Option<String>,
     },
 }
 
@@ -172,6 +178,9 @@ pub enum MigrateCommand {
         /// pending migrations. If already at the target version, then no-op.
         #[clap(long)]
         target_version: Option<i64>,
+
+        #[clap(long)]
+        migration_table: Option<String>,
     },
 
     /// Revert the latest migration with a down file.
@@ -194,6 +203,8 @@ pub enum MigrateCommand {
         /// at the target version, then no-op.
         #[clap(long)]
         target_version: Option<i64>,
+
+        migration_table: Option<String>,
     },
 
     /// List all available migrations.
@@ -203,6 +214,9 @@ pub enum MigrateCommand {
 
         #[clap(flatten)]
         connect_opts: ConnectOpts,
+
+        #[arg(long)]
+        migration_table: Option<String>,
     },
 
     /// Generate a `build.rs` to trigger recompilation when a new migration is added.
