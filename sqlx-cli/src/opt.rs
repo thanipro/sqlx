@@ -157,6 +157,9 @@ pub enum MigrateCommand {
         /// If set, use sequential versioning for the new migration. Conflicts with `--timestamp`.
         #[clap(short, long, conflicts_with = "timestamp")]
         sequential: bool,
+
+        #[clap(long)]
+        migration_table: Option<String>,
     },
 
     /// Run all pending migrations.

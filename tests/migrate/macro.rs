@@ -7,10 +7,10 @@ static EMBEDDED_SYMLINK: Migrator = sqlx::migrate!("tests/migrate/migrations_sym
 
 #[sqlx_macros::test]
 async fn same_output() -> anyhow::Result<()> {
-    let runtime_simple = Migrator::new(Path::new("tests/migrate/migrations_simple")).await?;
+    let runtime_simple = Migrator::new(Path::new("tests/migrate/migrations_simple"), Some(String::from("sqlx_migration"))).await?;
     let runtime_reversible =
-        Migrator::new(Path::new("tests/migrate/migrations_reversible")).await?;
-    let runtime_symlink = Migrator::new(Path::new("tests/migrate/migrations_symlink")).await?;
+        Migrator::new(Path::new("tests/migrate/migrations_reversible"), Some(String::from("sqlx_migration"))).await?;
+    let runtime_symlink = Migrator::new(Path::new("tests/migrate/migrations_symlink"), Some(String::from("sqlx_migration"))).await?;
 
     assert_same(&EMBEDDED_SIMPLE, &runtime_simple);
     assert_same(&EMBEDDED_REVERSIBLE, &runtime_reversible);

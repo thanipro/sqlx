@@ -106,10 +106,11 @@ pub async fn add(
     reversible: bool,
     sequential: bool,
     timestamp: bool,
+    migration_table: Option<String>,
 ) -> anyhow::Result<()> {
     fs::create_dir_all(migration_source).context("Unable to create migrations directory")?;
 
-    let migrator = Migrator::new(Path::new(migration_source)).await?;
+    let migrator = Migrator::new(Path::new(migration_source), migration_table).await?;
     // Type of newly created migration will be the same as the first one
     // or reversible flag if this is the first migration
     let migration_type = MigrationType::infer(&migrator, reversible);
@@ -181,7 +182,7 @@ fn short_checksum(checksum: &[u8]) -> String {
 }
 
 pub async fn info(migration_source: &str, connect_opts: &ConnectOpts, migration_table: Option<String>) -> anyhow::Result<()> {
-    let migrator = Migrator::new(Path::new(migration_source)).await?;
+    let migrator = Migrator::new(Path::new(migration_source), migration_table).await?;
     let mut conn = crate::connect(&connect_opts).await?;
 
     let migration_table = migration_table.unwrap_or_else(|| sqlx::migrate::DEFAULT_MIGRATION_TABLE.to_string());
@@ -270,7 +271,7 @@ pub async fn run(
     target_version: Option<i64>,
     migration_table: Option<String>,
 ) -> anyhow::Result<()> {
-    let migrator = Migrator::new(Path::new(migration_source)).await?;
+    let migrator = Migrator::new(Path::new(migration_source), migration_table).await?;
     if let Some(target_version) = target_version {
         if !migrator.version_exists(target_version) {
             bail!(MigrateError::VersionNotPresent(target_version));
@@ -367,7 +368,7 @@ pub async fn revert(
     target_version: Option<i64>,
     migration_table: Option<String>,
 ) -> anyhow::Result<()> {
-    let migrator = Migrator::new(Path::new(migration_source)).await?;
+    let migrator = Migrator::new(Path::new(migration_source), migration_table).await?;
     if let Some(target_version) = target_version {
         if target_version != 0 && !migrator.version_exists(target_version) {
             bail!(MigrateError::VersionNotPresent(target_version));

@@ -31,7 +31,7 @@ async fn simple(mut conn: PoolConnection<Postgres>) -> anyhow::Result<()> {
 async fn reversible(mut conn: PoolConnection<Postgres>) -> anyhow::Result<()> {
     clean_up(&mut conn).await?;
 
-    let migrator = Migrator::new(Path::new("tests/postgres/migrations_reversible")).await?;
+    let migrator = Migrator::new(Path::new("tests/postgres/migrations_reversible"), Some(String::from("migrations"))).await?;
 
     // run migration
     migrator.run(&mut conn).await?;

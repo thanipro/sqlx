@@ -48,13 +48,13 @@ impl Migrator {
     /// use std::path::Path;
     ///
     /// // Read migrations from a local folder: ./migrations
-    /// let m = Migrator::new(Path::new("./migrations")).await?;
+    /// let m = Migrator::new(Path::new("./migrations"), Some(String::from("migrations"))).await?;
     /// # Ok(())
     /// # })
     /// # }
     /// ```
     /// See [MigrationSource] for details on structure of the `./migrations` directory.
-    pub async fn new<'s, S>(source: S) -> Result<Self, MigrateError>
+    pub async fn new<'s, S>(source: S, migration_table: Option<String>) -> Result<Self, MigrateError>
     where
         S: MigrationSource<'s>,
     {
@@ -62,7 +62,7 @@ impl Migrator {
             migrations: Cow::Owned(source.resolve().await.map_err(MigrateError::Source)?),
             ignore_missing: false,
             locking: true,
-            migration_table: Some(String::from(DEFAULT_MIGRATION_TABLE)),
+            migration_table: Some(migration_table.unwrap_or_else(|| DEFAULT_MIGRATION_TABLE.to_string())),
         })
     }
 
@@ -120,7 +120,7 @@ impl Migrator {
     /// use sqlx::migrate::Migrator;
     /// use sqlx::sqlite::SqlitePoolOptions;
     ///
-    /// let m = Migrator::new(std::path::Path::new("./migrations")).await?;
+    /// let m = Migrator::new(std::path::Path::new("./migrations"), Some(String::from("migrations"))).await?;
     /// let pool = SqlitePoolOptions::new().connect("sqlite::memory:").await?;
     /// m.run(&pool).await
     /// #     })
@@ -200,7 +200,7 @@ impl Migrator {
     /// use sqlx::migrate::Migrator;
     /// use sqlx::sqlite::SqlitePoolOptions;
     ///
-    /// let m = Migrator::new(std::path::Path::new("./migrations")).await?;
+    /// let m = Migrator::new(std::path::Path::new("./migrations"), Some(String::from("migrations"))).await?;
     /// let pool = SqlitePoolOptions::new().connect("sqlite::memory:").await?;
     /// m.undo(&pool, 4).await
     /// #     })
